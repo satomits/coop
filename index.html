@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>おうちコープ 注文一覧</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+    font-family: -apple-system, 'Hiragino Sans', 'Yu Gothic', sans-serif;
+    font-size: 15px;
+    color: #222;
+    background: #f4f4f8;
+    padding: 12px;
+    max-width: 640px;
+    margin: 0 auto;
+}
+
+h1 {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 4px;
+    color: #1a1a2e;
+}
+
+.updated {
+    font-size: 12px;
+    color: #888;
+    margin-bottom: 14px;
+}
+
+.order {
+    background: #fff;
+    border-radius: 12px;
+    margin-bottom: 14px;
+    overflow: hidden;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+}
+
+.order-header {
+    padding: 10px 14px;
+    font-weight: bold;
+    font-size: 14px;
+    background: #1a1a2e;
+    color: #fff;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.order-header .summary {
+    font-size: 12px;
+    font-weight: normal;
+    opacity: 0.8;
+}
+
+.order-error {
+    padding: 10px 14px;
+    color: #c0392b;
+    font-size: 13px;
+    background: #fff5f5;
+}
+
+.item {
+    padding: 10px 14px;
+    border-top: 1px solid #f0f0f0;
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 8px;
+}
+
+.item-name {
+    font-size: 14px;
+    line-height: 1.4;
+    flex: 1;
+}
+
+.item-detail {
+    font-size: 13px;
+    color: #555;
+    white-space: nowrap;
+    text-align: right;
+}
+
+.total-row {
+    padding: 10px 14px;
+    border-top: 2px solid #1a1a2e;
+    display: flex;
+    justify-content: space-between;
+    font-weight: bold;
+    font-size: 15px;
+}
+
+.no-items {
+    padding: 10px 14px;
+    font-size: 13px;
+    color: #aaa;
+    border-top: 1px solid #f0f0f0;
+}
+</style>
+</head>
+<body>
+<h1>おうちコープ 注文一覧</h1>
+<p class="updated">2026/04/12 19:44 更新</p>
+<div class="order">
+<div class="order-header">4月3週 お届け 4月13日<span class="summary">26品 / ¥12,720</span></div>
+<div class="item"><div class="item-name">フルーツグラノーラチョコレート</div><div class="item-detail">¥298</div></div>
+<div class="item"><div class="item-name">かつお藁焼き（静岡県産）</div><div class="item-detail">¥580</div></div>
+<div class="item"><div class="item-name">春系きゃべつ</div><div class="item-detail">¥158</div></div>
+<div class="item"><div class="item-name">レンジで焼き餃子</div><div class="item-detail">x2 ¥636</div></div>
+<div class="item"><div class="item-name">茶美豚肩ロースと国産野菜の生姜焼きキット</div><div class="item-detail">¥1,050</div></div>
+<div class="item"><div class="item-name">ゆず香るやわらかとり天</div><div class="item-detail">¥368</div></div>
+<div class="item"><div class="item-name">骨取りさばのみぞれ煮</div><div class="item-detail">¥698</div></div>
+<div class="item"><div class="item-name">きんぴらはるさめ</div><div class="item-detail">¥498</div></div>
+<div class="item"><div class="item-name">汁なし肉うどん</div><div class="item-detail">¥428</div></div>
+<div class="item"><div class="item-name">わけあり清見オレンジ</div><div class="item-detail">¥698</div></div>
+<div class="item"><div class="item-name">ミニトマト（特大パック）増量</div><div class="item-detail">¥398</div></div>
+<div class="item"><div class="item-name">ベビーリーフミックス（有機栽培）</div><div class="item-detail">¥128</div></div>
+<div class="item"><div class="item-name">ミックスサラダ</div><div class="item-detail">¥128</div></div>
+<div class="item"><div class="item-name">静岡県産たけのこ水煮（カット）</div><div class="item-detail">¥458</div></div>
+<div class="item"><div class="item-name">豚小間切れ</div><div class="item-detail">¥510</div></div>
+<div class="item"><div class="item-name">茶美豚の豚ヒレ西京漬け</div><div class="item-detail">x2 ¥900</div></div>
+<div class="item"><div class="item-name">バターロール</div><div class="item-detail">¥158</div></div>
+<div class="item"><div class="item-name">国産大豆ひきわり納豆</div><div class="item-detail">¥128</div></div>
+<div class="item"><div class="item-name">岩下の新生姜ごはんの素</div><div class="item-detail">¥238</div></div>
+<div class="item"><div class="item-name">北海道十勝シュレッドチーズ（セルロース不使用）</div><div class="item-detail">¥750</div></div>
+<div class="item"><div class="item-name">北海道十勝牛乳でつくったミルクブレッド</div><div class="item-detail">¥358</div></div>
+<div class="item"><div class="item-name">Ｃ１００レモンヨーグルト</div><div class="item-detail">¥278</div></div>
+<div class="item"><div class="item-name">ざくざくココアクランチ</div><div class="item-detail">¥258</div></div>
+<div class="item"><div class="item-name">たまごスープ　徳用</div><div class="item-detail">¥528</div></div>
+<div class="item"><div class="item-name">ベイクドチーズケーキ</div><div class="item-detail">¥750</div></div>
+<div class="item"><div class="item-name">たまごとほうれん草のスープ</div><div class="item-detail">¥398</div></div>
+<div class="total-row"><span>合計</span><span>¥12,720</span></div>
+</div>
+</body>
+</html>
