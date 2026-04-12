@@ -1,0 +1,7 @@
+config.yaml
+debug/
+output.html
+_site/
+__pycache__/
+*.pyc
+.venv/

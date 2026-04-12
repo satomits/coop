@@ -1,0 +1,20 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "coop-delivery"
+version = "0.1.0"
+description = "おうちコープ（eふれんず）宅配注文一覧チェッカー"
+requires-python = ">=3.11"
+dependencies = [
+    "playwright>=1.58.0",
+    "anyio>=4.0",
+    "pyyaml>=6.0",
+]
+
+[project.scripts]
+coop-delivery = "coop_delivery.main:run"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/coop_delivery"]
