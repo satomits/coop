@@ -1,9 +1,9 @@
-  name: おうちコープ注文チェック
-
-  "on":
+    name: おうちコープ注文チェック                                                
+                                                                                
+  "on":                                                                         
     schedule:
-      - cron: '0 23 * * *'  # 8:00 JST
-      - cron: '0 3 * * *'   # 12:00 JST
+      - cron: '0 23 * * *'  # 8:00 JST                                          
+      - cron: '0 3 * * *'   # 12:00 JST                                         
       - cron: '0 9 * * *'   # 18:00 JST
     workflow_dispatch:
 
@@ -37,17 +37,22 @@
         - name: Create config.yaml from secret
           env:
             CONFIG: ${{ secrets.COOP_CONFIG_YAML }}
-          run: echo "$CONFIG" > config.yaml
+          run: |
+            echo "$CONFIG" > config.yaml
+            echo "config.yaml size: $(wc -c < config.yaml) bytes"
 
         - name: Run coop delivery check
-          run: uv run coop-delivery --html _site/index.html
-          continue-on-error: true
+          run: |
+            mkdir -p _site
+            uv run coop-delivery --html _site/index.html
 
         - name: Upload Pages artifact
+          if: always()
           uses: actions/upload-pages-artifact@v3
           with:
             path: _site
 
         - name: Deploy to GitHub Pages
+          if: always()
           id: deploy
           uses: actions/deploy-pages@v4
