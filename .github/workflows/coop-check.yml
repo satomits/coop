@@ -1,8 +1,53 @@
-name: おうちコープ注文チェック
-"on":                                                                       
+  name: おうちコープ注文チェック
+
+  "on":
     schedule:
       - cron: '0 23 * * *'  # 8:00 JST
       - cron: '0 3 * * *'   # 12:00 JST
       - cron: '0 9 * * *'   # 18:00 JST
     workflow_dispatch:
 
+  env:
+    FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+  permissions:
+    contents: read
+    pages: write
+    id-token: write
+
+  jobs:
+    check:
+      runs-on: ubuntu-latest
+      timeout-minutes: 30
+      environment:
+        name: github-pages
+        url: ${{ steps.deploy.outputs.page_url }}
+
+      steps:
+        - uses: actions/checkout@v4
+
+        - uses: astral-sh/setup-uv@v6
+
+        - name: Install dependencies
+          run: uv sync
+
+        - name: Install Playwright Chromium
+          run: uv run playwright install chromium --with-deps
+
+        - name: Create config.yaml from secret
+          env:
+            CONFIG: ${{ secrets.COOP_CONFIG_YAML }}
+          run: echo "$CONFIG" > config.yaml
+
+        - name: Run coop delivery check
+          run: uv run coop-delivery --html _site/index.html
+          continue-on-error: true
+
+        - name: Upload Pages artifact
+          uses: actions/upload-pages-artifact@v3
+          with:
+            path: _site
+
+        - name: Deploy to GitHub Pages
+          id: deploy
+          uses: actions/deploy-pages@v4
