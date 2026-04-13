@@ -1,10 +1,10 @@
-    name: おうちコープ注文チェック                                                
-                                                                                
+  name: おうちコープ注文チェック                                                
+                                                                              
   "on":                                                                         
-    schedule:
-      - cron: '0 23 * * *'  # 8:00 JST                                          
-      - cron: '0 3 * * *'   # 12:00 JST                                         
-      - cron: '0 9 * * *'   # 18:00 JST
+    schedule:                                                                   
+      - cron: '0 23 * * *'
+      - cron: '0 3 * * *'
+      - cron: '0 9 * * *'
     workflow_dispatch:
 
   env:
