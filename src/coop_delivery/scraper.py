@@ -99,8 +99,16 @@ async def _do_scrape(
             if debug and debug_dir:
                 await _save_debug(page, debug_dir, "04_selected_week")
 
-    # 注文データをパース
-    return await _parse_history_page(page, debug, debug_dir)
+        # 注文データをパース
+        return await _parse_history_page(page, debug, debug_dir)
+
+    # 全週が過去 → トップページ（注文ページ）から現在受付中の週を取得
+    if debug:
+        print("  all history weeks are past, falling back to order page")
+    await page.goto(LOGIN_URL, wait_until="domcontentloaded")
+    if debug and debug_dir:
+        await _save_debug(page, debug_dir, "04_order_page")
+    return await _parse_order_page(page, debug, debug_dir)
 
 
 async def _find_nearest_week(
@@ -129,6 +137,7 @@ async def _find_nearest_week(
             return current
 
     # デフォルトが過去の場合、各週を試す
+    default_value = await page.eval_on_selector('select[name="history"]', "el => el.value")
     options = await page.eval_on_selector_all(
         'select[name="history"] option',
         "els => els.map(el => ({value: el.value, text: el.textContent.trim()}))",
@@ -163,7 +172,13 @@ async def _find_nearest_week(
 
     if best:
         return best[1]
-    # 全て過去 → 最も新しい週（デフォルト）
+
+    # 全て過去 → デフォルト週に戻してから None を返す
+    await page.select_option('select[name="history"]', default_value)
+    await page.click('input.button.reload')
+    await page.wait_for_load_state("domcontentloaded")
+    if debug:
+        print(f"  no future week found, restored default: {default_value}")
     return None
 
 
@@ -254,6 +269,95 @@ async def _parse_history_page(
 
     if debug and debug_dir:
         await _save_debug(page, debug_dir, "05_parsed")
+
+    return DeliveryOrder(
+        delivery_date=date_display.strip(),
+        items=items,
+        total=total,
+    )
+
+
+async def _parse_order_page(
+    page: Page,
+    debug: bool,
+    debug_dir: Path | None,
+) -> DeliveryOrder:
+    """トップページ（注文ページ）から現在受付中の注文データをパースする。"""
+    # お届け日: dd.delivery から取得（prefix無し、例: "4月20日"）
+    delivery_date = ""
+    delivery_el = await page.query_selector("dd.delivery")
+    if delivery_el:
+        delivery_date = (await delivery_el.inner_text()).strip()
+
+    # 企画週名: div.planName から取得
+    week_name = ""
+    plan_el = await page.query_selector("div.planName")
+    if plan_el:
+        week_name = (await plan_el.inner_text()).strip()
+
+    # 商品行をパース: table.standard 内の tr（ヘッダ行を除く）
+    items: list[OrderItem] = []
+    rows = await page.query_selector_all("table.standard tbody tr")
+    for row in rows:
+        th = await row.query_selector("th")
+        if th:
+            continue
+
+        name_el = await row.query_selector(".name_clm")
+        if not name_el:
+            continue
+        name = (await name_el.inner_text()).strip()
+        if not name:
+            continue
+
+        price = 0
+        price_el = await row.query_selector(".price_clm")
+        if price_el:
+            price_text = (await price_el.inner_text()).strip()
+            digits = "".join(c for c in price_text if c.isdigit())
+            if digits:
+                price = int(digits)
+
+        quantity = 1
+        qty_el = await row.query_selector(".quantity_clm")
+        if qty_el:
+            qty_text = (await qty_el.inner_text()).strip()
+            digits = "".join(c for c in qty_text if c.isdigit())
+            if digits:
+                quantity = int(digits)
+
+        items.append(OrderItem(name=name, quantity=quantity, price=price))
+
+    # 合計金額
+    total = 0
+    amount_rows = await page.query_selector_all("tr.row_amount .total_amount_clm")
+    for el in amount_rows:
+        text = (await el.inner_text()).strip()
+        m = re.search(r"税込単純合計金額([\d,]+)", text)
+        if m:
+            total = int(m.group(1).replace(",", ""))
+            break
+    if not total:
+        total = sum(item.price * item.quantity for item in items)
+
+    # 表示テキスト
+    date_display = ""
+    if week_name:
+        date_display = week_name
+    if delivery_date:
+        date_display += f" お届け {delivery_date}"
+    if not date_display:
+        date_display = "次回配達"
+
+    if debug:
+        print(f"  order page result: date={date_display!r} items={len(items)} total={total}")
+        for item in items[:5]:
+            print(f"    {item.name} x{item.quantity} ¥{item.price}")
+        if len(items) > 5:
+            print(f"    ... and {len(items) - 5} more")
+
+    if debug and debug_dir:
+        await _save_debug(page, debug_dir, "05_order_parsed")
 
     return DeliveryOrder(
         delivery_date=date_display.strip(),
